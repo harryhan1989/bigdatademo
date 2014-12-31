@@ -1,0 +1,1 @@
+sqoop export 每direct 每connect 'jdbc:sqlserver://192.168.11.41;username=sa;password=Stellar123;database=MedCenter' 每table kpivalue_tmp 每export-dir  /apps/hive/warehouse/kpivalue_tmp/dt=

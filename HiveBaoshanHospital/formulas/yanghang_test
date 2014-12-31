@@ -1,0 +1,6 @@
+1006,SELECT count(1) FROM SS_SSDJK where kssj like '20130922%'
+1014,SELECT COUNT(1) FROM ZY_BRSYK where ryrq like '20130922%'
+1015,SELECT COUNT(1) FROM ZY_BRJSK where jlzt=0 and ybjszt=2 AND jsrq like '20130922%'
+1022,SELECT sum(zje) FROM ZY_BRJSK where jsrq like '20130922%' and jlzt=0
+3002,select count(distinct ypmc)/688.0 from YK_YPCDMLK where ypsms in ('¹ú','ÊÐ')   
+3032,SELECT SUM(a.xmje) FROM ZY_BRJSMXK a inner join ZY_BRJSK b on a.jsxh=b.xh where  b.jsrq like '20130922%' and a.dxmdm in('01','02','03')

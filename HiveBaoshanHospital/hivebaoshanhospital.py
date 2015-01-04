@@ -77,6 +77,7 @@ class hivebaoshanhospital:
         hivehelper("default").create_kpi_value_tmp_partition(now_str)
         hivehelper("default").sql_excute("LOAD DATA LOCAL INPATH 'HiveBaoshanHospital/"+utilities.get_config_value('tmp_data_name')+"' \
                         OVERWRITE INTO TABLE kpivalue_tmp PARTITION (dt='"+now_str+"')")
+        #todo:connect your sqlserver, and filling the data
 
 
     def auto_time_retrive_kpis(self):

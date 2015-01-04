@@ -19,17 +19,20 @@ formula_default_start_date=utilities.get_config_value('f_tmp_start_date')
 formula_default_end_date=utilities.get_config_value('f_tmp_end_date')
 def formula_task(formula,database_name,date_granularity):
     global tmp_data
-    kpi_code=formula[0:formula.find(',')]
-    first_date=date_granularity.get("first")
-    granularity=date_granularity.get("granularity")
-    kpi_formula=formula[formula.index(',')+1:len(formula)]
-    kpi_value=hivehelper(database_name).sql_excute(kpi_formula)
     value=[]
-    value.append(database_name)
-    value.append(kpi_code)
-    value.append(first_date)
-    value.append(granularity)
-    value.append(kpi_value[0][0])
+    try:
+        kpi_code=formula[0:formula.find(',')]
+        first_date=date_granularity.get("first")
+        granularity=date_granularity.get("granularity")
+        kpi_formula=formula[formula.index(',')+1:len(formula)]
+        kpi_value=hivehelper(database_name).sql_excute(kpi_formula)
+        value.append(database_name)
+        value.append(kpi_code)
+        value.append(re.sub(r'[/-]','',first_date))
+        value.append(granularity)
+        value.append(int(kpi_value[0][0] or 0))
+    except Exception,e:
+        print e
     return value
     
 def formula_task_wrapper(args):
@@ -51,9 +54,9 @@ class hivebaoshanhospital:
     
     def manul_multi_time_retrive_kpis(self):
         global tmp_data  
-        print self.max_pool_size
-        print self.start_date
-        print self.end_date
+        print "max pool size is:"+str(self.max_pool_size)
+        print "start date is:"+str(self.start_date)
+        print "end date is:"+str(self.end_date)
         formula_files=iohelper.get_files(self.formula_folder_path)
         for formula_file in formula_files:
             formulas=iohelper.read_file_line(formula_file.get("dir"),formula_file.get("file"))
@@ -66,19 +69,18 @@ class hivebaoshanhospital:
             sleep(10)
         self.pool.close()
         iohelper.writ_file_to_cvs_two_level(utilities.get_config_value('tmp_data_path'),utilities.get_config_value('tmp_data_name'),tmp_data)
-        subprocess.Popen("./tmpdata_load_into_hive.sh",shell=True)
-        hivehelper("default").sql_excute("LOAD DATA LOCAL INPATH 'HiveBaoshanHospital/tmpdata.csv' OVERWRITE INTO TABLE kpivalue_tmp")
+        #subprocess.Popen("./tmpdata_load_into_hive.sh",shell=True)
         self.data_importhive_exportmssql()
 
 
     def data_importhive_exportmssql(self):
+        ''''''
         now_str=str(utilities.format_date(datetime.now()))
         hivehelper("default").create_kpi_value_tmp()
         hivehelper("default").create_kpi_value_tmp_partition(now_str)
         hivehelper("default").sql_excute("LOAD DATA LOCAL INPATH 'HiveBaoshanHospital/"+utilities.get_config_value('tmp_data_name')+"' \
                         OVERWRITE INTO TABLE kpivalue_tmp PARTITION (dt='"+now_str+"')")
-        #todo:connect your sqlserver, and filling the data
-
+        #mssql data filling,not done
 
     def auto_time_retrive_kpis(self):
         ''''''
